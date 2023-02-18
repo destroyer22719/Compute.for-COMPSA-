@@ -2,7 +2,7 @@ const { checkPrimeSync } = require("node:crypto");
 const BigNumber = require("bignumber.js");
 
 BigNumber.config({ EXPONENTIAL_AT: 1e9 });
-const RSA = new BigNumber("897710095327");
+const RSA = new BigNumber("977248249967681");
 
 // https://bigprimes.org/RSA-challenge
 function findRSA() {

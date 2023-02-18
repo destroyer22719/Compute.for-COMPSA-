@@ -5,7 +5,7 @@ async function main() {
   BigNumber.config({ EXPONENTIAL_AT: 1e9 });
   const compute = require("dcp/compute");
 
-  const RSA = new BigNumber("897710095327");
+  const RSA = new BigNumber("977248249967681");
 
   // making input sets
   function makeIntervals(n, total) {
@@ -30,41 +30,41 @@ async function main() {
 
   // work function
   function findRSA(data) {
-    function power(x, y, p) {
-      let res = 1n;
-
-      x %= p;
-      while (y > 0n) {
-        if (y & 1n) res = (res * x) % p;
-
-        y /= 2n;
-        x = (x * x) % p;
-      }
-      return res;
-    }
-
-    function miillerTest(d, n) {
-      const r = BigInt(Math.floor(Math.random() * 100_000));
-      const y = (r * (n - 2n)) / 100_000n;
-      const a = 2n + (y % (n - 4n));
-
-      // Compute a^d % n
-      let x = power(a, d, n);
-
-      if (x == 1n || x == n - 1n) return true;
-
-      while (d != n - 1n) {
-        x = (x * x) % n;
-        d *= 2n;
-
-        if (x == 1n) return false;
-        if (x == n - 1n) return true;
-      }
-
-      return false;
-    }
-
     function isPrime(n, k = 40) {
+      function power(x, y, p) {
+        let res = 1n;
+
+        x %= p;
+        while (y > 0n) {
+          if (y & 1n) res = (res * x) % p;
+
+          y /= 2n;
+          x = (x * x) % p;
+        }
+        return res;
+      }
+
+      function miillerTest(d, n) {
+        const r = BigInt(Math.floor(Math.random() * 100_000));
+        const y = (r * (n - 2n)) / 100_000n;
+        const a = 2n + (y % (n - 4n));
+
+        // Compute a^d % n
+        let x = power(a, d, n);
+
+        if (x == 1n || x == n - 1n) return true;
+
+        while (d != n - 1n) {
+          x = (x * x) % n;
+          d *= 2n;
+
+          if (x == 1n) return false;
+          if (x == n - 1n) return true;
+        }
+
+        return false;
+      }
+
       if (n <= 1n || n == 4n) return false;
       if (n <= 3n) return true;
 
@@ -85,8 +85,10 @@ async function main() {
     start = new BigNumber(start);
     stop = new BigNumber(stop);
     const RSA = new BigNumber(num);
+    
     for (let i = start; i < stop; i++) {
       // This code gives a bug?
+      progress();
       // progress(`${i}/${RSA.sqrt().decimalPlaces(0, 1).toString()}`);
       if (RSA.mod(i).isZero()) {
         if (isPrime(BigInt(i.toString()))) {
@@ -104,6 +106,7 @@ async function main() {
   const inputSet = makeIntervals(5, RSA.sqrt().decimalPlaces(0, 1));
 
   const job = compute.for(inputSet, findRSA);
+  job.computeGroups = [{joinKey: "insight", joinSecret: "dcp"}]
   job.requires("bignumber.js");
 
   job.on("result", (ev) => {
@@ -113,8 +116,8 @@ async function main() {
     }
   });
 
-  // const resultSet = await job.exec();
-  const resultSet = await job.localExec();
+  const resultSet = await job.exec();
+  // const resultSet = await job.localExec();
   console.log(resultSet);
 }
 
